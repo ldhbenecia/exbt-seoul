@@ -2,7 +2,13 @@ import { Exhibition } from '../types/exhibition';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Calendar, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react';
+import {
+  Calendar,
+  MapPin,
+  Clock,
+  DollarSign,
+  ExternalLink,
+} from 'lucide-react';
 
 interface ExhibitionDetailProps {
   exhibition: Exhibition | null;
@@ -10,12 +16,18 @@ interface ExhibitionDetailProps {
   onClose: () => void;
 }
 
-export function ExhibitionDetail({ exhibition, open, onClose }: ExhibitionDetailProps) {
+export function ExhibitionDetail({
+  exhibition,
+  open,
+  onClose,
+}: ExhibitionDetailProps) {
   if (!exhibition) return null;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+    return `${date.getFullYear()}년 ${
+      date.getMonth() + 1
+    }월 ${date.getDate()}일`;
   };
 
   const getCategoryLabel = (category: string) => {
@@ -31,24 +43,35 @@ export function ExhibitionDetail({ exhibition, open, onClose }: ExhibitionDetail
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-md sm:max-w-xl lg:max-w-2xl max-h-[90vh] p-8 overflow-y-auto scrollbar-hide">
         <DialogHeader>
-          <DialogTitle className="text-2xl">{exhibition.title}</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl break-keep w-[90%] sm:max-w-md text-center m-auto">
+            {exhibition.title}
+          </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6">
-          <div className="aspect-video overflow-hidden rounded-lg">
+          <div className="overflow-hidden rounded-lg">
             <img
               src={exhibition.imageUrl}
               alt={exhibition.title}
-              className="w-full h-full object-cover"
+              className="w-full sm:w-2/3 h-full m-auto rounded-lg object-cover"
             />
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Badge>{getCategoryLabel(exhibition.category)}</Badge>
-              {exhibition.isFree && <Badge variant="secondary">무료 관람</Badge>}
+              {exhibition.isFree && (
+                <Badge variant="secondary">무료 관람</Badge>
+              )}
+            </div>
+
+            <div>
+              <p className="text-muted-foreground">전시 소개</p>
+              <p className="mt-1 text-foreground/90">
+                {exhibition.description}
+              </p>
             </div>
 
             <div>
@@ -56,15 +79,10 @@ export function ExhibitionDetail({ exhibition, open, onClose }: ExhibitionDetail
               <p className="mt-1">{exhibition.artist}</p>
             </div>
 
-            <div>
-              <p className="text-muted-foreground">전시 소개</p>
-              <p className="mt-1 text-foreground/90">{exhibition.description}</p>
-            </div>
-
             <div className="grid gap-3 pt-2">
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
-                <div>
+                <div className="space-y-1">
                   <p>{exhibition.venue}</p>
                   <p className="text-muted-foreground">{exhibition.location}</p>
                 </div>
@@ -73,7 +91,8 @@ export function ExhibitionDetail({ exhibition, open, onClose }: ExhibitionDetail
               <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-muted-foreground shrink-0" />
                 <p>
-                  {formatDate(exhibition.startDate)} - {formatDate(exhibition.endDate)}
+                  {formatDate(exhibition.startDate)} -{' '}
+                  {formatDate(exhibition.endDate)}
                 </p>
               </div>
 
@@ -89,8 +108,12 @@ export function ExhibitionDetail({ exhibition, open, onClose }: ExhibitionDetail
             </div>
 
             {exhibition.website && (
-              <Button asChild className="w-full mt-4">
-                <a href={exhibition.website} target="_blank" rel="noopener noreferrer">
+              <Button asChild className="w-full mt-4" size="lg">
+                <a
+                  href={exhibition.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   웹사이트 방문하기
                   <ExternalLink className="w-4 h-4 ml-2" />
                 </a>
