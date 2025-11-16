@@ -1,0 +1,20 @@
+# Dependencies and build
+node_modules
+.next
+dist
+out
+coverage
+
+# Package managers
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Misc
+.cache
+.idea
+.vscode
+.DS_Store
+
+# Generated assets
+public/**/*.min.*.js
