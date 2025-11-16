@@ -1,20 +1,18 @@
 import { NextResponse } from 'next/server';
 import { clearCache } from '@/lib/cache';
 
-// 전시회 정보를 수동으로 새로고침하는 엔드포인트
-// 크론 잡이나 수동 호출로 사용 가능
 export async function POST(request: Request) {
   try {
-    const authHeader = request.headers.get('authorization');
+    const authHeader = request.headers.get('authorization') || '';
+    const expectedToken = process.env.REFRESH_TOKEN;
 
-    // 간단한 인증 (프로덕션에서는 더 강력한 인증 사용)
-    const expectedToken = process.env.REFRESH_TOKEN || 'your-secret-token';
-
+    if (!expectedToken) {
+      return NextResponse.json({ error: 'Server not configured' }, { status: 500 });
+    }
     if (authHeader !== `Bearer ${expectedToken}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 캐시 클리어
     clearCache();
 
     return NextResponse.json({
