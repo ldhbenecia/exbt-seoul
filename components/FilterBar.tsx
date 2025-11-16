@@ -30,10 +30,7 @@ export function FilterBar({
         />
       </div>
 
-      <Tabs
-        value={category}
-        onValueChange={(value) => onCategoryChange(value as CategoryType)}
-      >
+      <Tabs value={category} onValueChange={(value) => onCategoryChange(value as CategoryType)}>
         <TabsList className="w-full justify-start overflow-x-auto scrollbar-hide flex-nowrap h-auto gap-1 bg-muted/50 p-1.5 rounded-xl">
           <TabsTrigger
             value="all"

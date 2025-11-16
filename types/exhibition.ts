@@ -1,19 +1,24 @@
 export interface Exhibition {
   id: string;
   title: string;
-  artist: string;
+  artist?: string;
   venue: string;
-  location: string;
-  category: string;
-  startDate: string;
-  endDate: string;
-  description: string;
-  imageUrl: string;
-  price: string;
-  hours: string;
+  location?: string;
+  category?: string;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+  imageUrl?: string;
+  price?: string;
+  hours?: string;
   website?: string;
-  isFree: boolean;
+  isFree?: boolean;
 }
 
-export type CategoryType = 'all' | 'contemporary' | 'photography' | 'sculpture' | 'digital' | 'traditional';
-
+export type CategoryType =
+  | 'all'
+  | 'contemporary'
+  | 'photography'
+  | 'sculpture'
+  | 'digital'
+  | 'traditional';

@@ -7,7 +7,7 @@ const CACHE_DURATION = 60 * 60 * 1000; // 1시간
 
 export function getCachedExhibitions(): Exhibition[] | null {
   const now = Date.now();
-  if (exhibitionCache && (now - cacheTimestamp) < CACHE_DURATION) {
+  if (exhibitionCache && now - cacheTimestamp < CACHE_DURATION) {
     return exhibitionCache;
   }
   return null;
@@ -22,4 +22,3 @@ export function clearCache(): void {
   exhibitionCache = null;
   cacheTimestamp = 0;
 }
-

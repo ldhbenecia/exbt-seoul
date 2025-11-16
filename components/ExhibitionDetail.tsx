@@ -2,13 +2,7 @@ import { Exhibition } from '../types/exhibition';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import {
-  Calendar,
-  MapPin,
-  Clock,
-  DollarSign,
-  ExternalLink,
-} from 'lucide-react';
+import { Calendar, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react';
 
 interface ExhibitionDetailProps {
   exhibition: Exhibition | null;
@@ -16,18 +10,12 @@ interface ExhibitionDetailProps {
   onClose: () => void;
 }
 
-export function ExhibitionDetail({
-  exhibition,
-  open,
-  onClose,
-}: ExhibitionDetailProps) {
+export function ExhibitionDetail({ exhibition, open, onClose }: ExhibitionDetailProps) {
   if (!exhibition) return null;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return `${date.getFullYear()}년 ${
-      date.getMonth() + 1
-    }월 ${date.getDate()}일`;
+    return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
   };
 
   const getCategoryLabel = (category: string) => {
@@ -62,16 +50,12 @@ export function ExhibitionDetail({
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Badge>{getCategoryLabel(exhibition.category)}</Badge>
-              {exhibition.isFree && (
-                <Badge variant="secondary">무료 관람</Badge>
-              )}
+              {exhibition.isFree && <Badge variant="secondary">무료 관람</Badge>}
             </div>
 
             <div>
               <p className="text-muted-foreground">전시 소개</p>
-              <p className="mt-1 text-foreground/90">
-                {exhibition.description}
-              </p>
+              <p className="mt-1 text-foreground/90">{exhibition.description}</p>
             </div>
 
             <div>
@@ -91,8 +75,7 @@ export function ExhibitionDetail({
               <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-muted-foreground shrink-0" />
                 <p>
-                  {formatDate(exhibition.startDate)} -{' '}
-                  {formatDate(exhibition.endDate)}
+                  {formatDate(exhibition.startDate)} - {formatDate(exhibition.endDate)}
                 </p>
               </div>
 
@@ -109,11 +92,7 @@ export function ExhibitionDetail({
 
             {exhibition.website && (
               <Button asChild className="w-full mt-4" size="lg">
-                <a
-                  href={exhibition.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={exhibition.website} target="_blank" rel="noopener noreferrer">
                   웹사이트 방문하기
                   <ExternalLink className="w-4 h-4 ml-2" />
                 </a>

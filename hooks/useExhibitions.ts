@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Exhibition } from '@/types/exhibition';
@@ -13,11 +13,11 @@ export function useExhibitions() {
       try {
         setIsLoading(true);
         const response = await fetch('/api/exhibitions');
-        
+
         if (!response.ok) {
           throw new Error('전시회 정보를 불러오는데 실패했습니다.');
         }
-        
+
         const data = await response.json();
         setExhibitions(data);
       } catch (err) {
@@ -33,4 +33,3 @@ export function useExhibitions() {
 
   return { exhibitions, isLoading, error };
 }
-

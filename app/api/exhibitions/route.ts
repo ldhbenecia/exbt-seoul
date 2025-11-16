@@ -29,9 +29,8 @@ export async function GET() {
     return NextResponse.json(exhibitions);
   } catch (error) {
     console.error('Error fetching exhibitions:', error);
-    
+
     // 에러 발생 시 mock 데이터 반환
     return NextResponse.json(mockExhibitions);
   }
 }
-

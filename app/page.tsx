@@ -10,8 +10,7 @@ import { Button } from '@/components/ui/button';
 
 export default function Home() {
   const { exhibitions, isLoading, error } = useExhibitions();
-  const [selectedExhibition, setSelectedExhibition] =
-    useState<Exhibition | null>(null);
+  const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null);
   const [category, setCategory] = useState<CategoryType>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -40,8 +39,7 @@ export default function Home() {
     if (!exhibitions) return [];
 
     return exhibitions.filter((exhibition) => {
-      const matchesCategory =
-        category === 'all' || exhibition.category === category;
+      const matchesCategory = category === 'all' || exhibition.category === category;
       const matchesSearch =
         searchQuery === '' ||
         exhibition.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -53,9 +51,7 @@ export default function Home() {
   }, [exhibitions, category, searchQuery]);
 
   const scrollToExhibitions = () => {
-    document
-      .getElementById('exhibitions-section')
-      ?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('exhibitions-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -114,10 +110,8 @@ export default function Home() {
         {!isLoading && !error && filteredExhibitions.length > 0 && (
           <div className="mb-4 ml-1 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
             <p className="text-sm lg:text-base text-muted-foreground">
-              <span className="font-medium text-foreground">
-                {filteredExhibitions.length}개
-              </span>
-              의 전시회를 찾았습니다
+              <span className="font-medium text-foreground">{filteredExhibitions.length}개</span>의
+              전시회를 찾았습니다
             </p>
           </div>
         )}
@@ -138,18 +132,14 @@ export default function Home() {
             <p className="text-destructive text-base sm:text-lg font-medium">
               전시회 정보를 불러오는데 실패했습니다
             </p>
-            <p className="text-muted-foreground mt-2 text-sm sm:text-base">
-              {error}
-            </p>
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base">{error}</p>
           </div>
         )}
 
         {/* Empty State */}
         {!isLoading && !error && filteredExhibitions.length === 0 && (
           <div className="text-center py-24 sm:py-32">
-            <p className="text-muted-foreground text-base sm:text-lg">
-              검색 결과가 없습니다
-            </p>
+            <p className="text-muted-foreground text-base sm:text-lg">검색 결과가 없습니다</p>
             <p className="text-muted-foreground/70 mt-2 text-sm">
               다른 검색어나 카테고리를 시도해보세요
             </p>

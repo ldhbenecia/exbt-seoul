@@ -45,18 +45,14 @@ export function ExhibitionCard({ exhibition, onClick }: ExhibitionCardProps) {
   // const aspectRatio =
   //   aspectRatios[parseInt(exhibition.id) % aspectRatios.length];
 
-  const aspectRatio =
-    aspectRatios[Math.floor(Math.random() * aspectRatios.length)];
+  const aspectRatio = aspectRatios[Math.floor(Math.random() * aspectRatios.length)];
 
   return (
     <div
       className="group relative overflow-hidden bg-card transition-all cursor-pointer border-transparent mb-6"
       onClick={onClick}
     >
-      <div
-        className={`overflow-hidden rounded-xl aspect-[${aspectRatio}]`}
-        style={{ aspectRatio }}
-      >
+      <div className={`overflow-hidden rounded-xl aspect-[${aspectRatio}]`} style={{ aspectRatio }}>
         <img
           src={exhibition.imageUrl}
           alt={exhibition.title}
@@ -66,9 +62,7 @@ export function ExhibitionCard({ exhibition, onClick }: ExhibitionCardProps) {
 
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex flex-col justify-end p-4">
-          <h3 className="text-white text-sm sm:text-lg font-semibold">
-            {exhibition.title}
-          </h3>
+          <h3 className="text-white text-sm sm:text-lg font-semibold">{exhibition.title}</h3>
           <p className="text-white/80 text-sm mt-1">{exhibition.artist}</p>
           <div className="text-white/80 text-xs mt-2 space-y-1">
             <div className="flex items-center gap-2">
@@ -78,8 +72,7 @@ export function ExhibitionCard({ exhibition, onClick }: ExhibitionCardProps) {
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 shrink-0" />
               <span>
-                {formatDate(exhibition.startDate)} -{' '}
-                {formatDate(exhibition.endDate)}
+                {formatDate(exhibition.startDate)} - {formatDate(exhibition.endDate)}
               </span>
             </div>
           </div>
