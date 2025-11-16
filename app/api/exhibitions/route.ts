@@ -1,50 +1,35 @@
 import { NextResponse } from 'next/server';
-import { getCachedExhibitions, setCachedExhibitions } from '@/lib/cache';
-import { scrapeAllExhibitions } from '@/lib/scraper';
+import { fetchEventsPage } from '@/lib/clients';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 3600;
+export const revalidate = 120;
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const cached = getCachedExhibitions();
-    if (cached) {
-      return NextResponse.json(cached, {
-        headers: {
-          'Cache-Control': 'public, max-age=300, s-maxage=300',
-          ETag: `"exbt-${cached.length}"`,
-          'Last-Modified': new Date().toUTCString(),
-        },
-      });
-    }
+    const url = new URL(req.url);
+    const page = Number(url.searchParams.get('page') ?? '1');
+    const pageSize = Number(url.searchParams.get('pageSize') ?? '20');
+    const codename = url.searchParams.get('codename') ?? '';
+    const title = url.searchParams.get('title') ?? '';
+    const date = url.searchParams.get('date') ?? '';
 
-    const exhibitions = await scrapeAllExhibitions();
-
-    if (!exhibitions || exhibitions.length === 0) {
-      return NextResponse.json(
-        { error: 'No exhibitions found' },
-        {
-          status: 404,
-          headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' },
-        }
-      );
-    }
-
-    setCachedExhibitions(exhibitions);
-
-    return NextResponse.json(exhibitions, {
-      headers: {
-        'Cache-Control': 'public, max-age=300, s-maxage=300',
-        ETag: `"exbt-${exhibitions.length}"`,
-        'Last-Modified': new Date().toUTCString(),
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching exhibitions:', error);
+    const { data, meta } = await fetchEventsPage({ page, pageSize, codename, title, date });
 
     return NextResponse.json(
+      { data, meta },
+      {
+        headers: {
+          'Cache-Control': 'public, max-age=120, s-maxage=120',
+          ETag: `"evt-p${meta.page}-s${meta.pageSize}-c${meta.count}"`,
+          'Last-Modified': new Date().toUTCString(),
+        },
+      }
+    );
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    return NextResponse.json(
       { error: 'Service temporarily unavailable' },
-      { status: 503, headers: { 'Retry-After': '300' } }
+      { status: 503, headers: { 'Retry-After': '120' } }
     );
   }
 }
