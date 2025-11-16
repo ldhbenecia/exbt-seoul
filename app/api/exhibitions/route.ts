@@ -1,36 +1,50 @@
 import { NextResponse } from 'next/server';
 import { getCachedExhibitions, setCachedExhibitions } from '@/lib/cache';
 import { scrapeAllExhibitions } from '@/lib/scraper';
-import { mockExhibitions } from '@/data/mockExhibitions';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 3600; // 1시간마다 재검증
+export const revalidate = 3600;
 
 export async function GET() {
   try {
-    // 캐시 확인
     const cached = getCachedExhibitions();
     if (cached) {
-      return NextResponse.json(cached);
+      return NextResponse.json(cached, {
+        headers: {
+          'Cache-Control': 'public, max-age=300, s-maxage=300',
+          ETag: `"exbt-${cached.length}"`,
+          'Last-Modified': new Date().toUTCString(),
+        },
+      });
     }
 
-    // 크롤링 시도
-    let exhibitions = await scrapeAllExhibitions();
+    const exhibitions = await scrapeAllExhibitions();
 
-    // 크롤링 실패 시 mock 데이터 사용 (개발/테스트용)
-    if (exhibitions.length === 0) {
-      console.log('No exhibitions found from scraping, using mock data');
-      exhibitions = mockExhibitions;
+    if (!exhibitions || exhibitions.length === 0) {
+      return NextResponse.json(
+        { error: 'No exhibitions found' },
+        {
+          status: 404,
+          headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' },
+        }
+      );
     }
 
-    // 캐시에 저장
     setCachedExhibitions(exhibitions);
 
-    return NextResponse.json(exhibitions);
+    return NextResponse.json(exhibitions, {
+      headers: {
+        'Cache-Control': 'public, max-age=300, s-maxage=300',
+        ETag: `"exbt-${exhibitions.length}"`,
+        'Last-Modified': new Date().toUTCString(),
+      },
+    });
   } catch (error) {
     console.error('Error fetching exhibitions:', error);
 
-    // 에러 발생 시 mock 데이터 반환
-    return NextResponse.json(mockExhibitions);
+    return NextResponse.json(
+      { error: 'Service temporarily unavailable' },
+      { status: 503, headers: { 'Retry-After': '300' } }
+    );
   }
 }
