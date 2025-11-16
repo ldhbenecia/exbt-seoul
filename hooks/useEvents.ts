@@ -1,21 +1,21 @@
 'use client';
 
+import { CulturalEvent } from '@/lib/types/culturalEvent';
 import { useState, useEffect } from 'react';
-import { Exhibition } from '@/types/exhibition';
 
 type EventsResponse = {
-  data: Exhibition[];
+  data: CulturalEvent[];
   meta: { total: number; page: number; pageSize: number; count: number };
 };
 
-export function useExhibitions(
+export function useEvents(
   initialPage = 1,
   initialPageSize = 20,
   codename = '',
   title = '',
   date = ''
 ) {
-  const [items, setItems] = useState<Exhibition[]>([]);
+  const [items, setItems] = useState<CulturalEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusCode, setStatusCode] = useState<number | null>(null);
@@ -41,7 +41,7 @@ export function useExhibitions(
         if (title) qs.set('title', title);
         if (date) qs.set('date', date);
 
-        const res = await fetch(`/api/exhibitions?${qs.toString()}`);
+        const res = await fetch(`/api/events?${qs.toString()}`);
         if (!res.ok) {
           setStatusCode(res.status);
           if (res.status === 404) throw new Error('현재 수집된 정보가 없습니다.');

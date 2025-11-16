@@ -1,11 +1,11 @@
-import { Exhibition } from '../types/exhibition';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Calendar, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react';
+import { CulturalEvent } from '@/lib/types/culturalEvent';
 
-interface ExhibitionDetailProps {
-  exhibition: Exhibition | null;
+interface CulturalEventDetailProps {
+  culturalEvent: CulturalEvent | null;
   open: boolean;
   onClose: () => void;
 }
@@ -22,21 +22,21 @@ function getCodenameLabel(codename?: string) {
   return codename && codename.trim().length > 0 ? codename : '분류 없음';
 }
 
-export function ExhibitionDetail({ exhibition, open, onClose }: ExhibitionDetailProps) {
-  if (!exhibition) return null;
+export function CulturalEventDetail({ culturalEvent, open, onClose }: CulturalEventDetailProps) {
+  if (!culturalEvent) return null;
 
-  const title = exhibition.title || '제목 없음';
-  const imageSrc = exhibition.imageUrl || '/placeholder.png';
-  const venue = exhibition.place || '장소 정보 없음';
-  const gu = exhibition.guname || ''; // 자치구
+  const title = culturalEvent.title || '제목 없음';
+  const imageSrc = culturalEvent.imageUrl || '/placeholder.png';
+  const venue = culturalEvent.place || '장소 정보 없음';
+  const gu = culturalEvent.guname || ''; // 자치구
   const description =
-    exhibition.description && exhibition.description.trim().length > 0
-      ? exhibition.description
+    culturalEvent.description && culturalEvent.description.trim().length > 0
+      ? culturalEvent.description
       : `${title} 전시/행사입니다.`;
-  const actorOrOrg = ((exhibition.player || '') + ' ' + (exhibition.orgName || '')).trim();
-  const hours = exhibition.proTime || exhibition.date || '';
-  const price = exhibition.useFee || '';
-  const website = exhibition.website || exhibition.hmpgAddr || exhibition.orgLink || '';
+  const actorOrOrg = ((culturalEvent.player || '') + ' ' + (culturalEvent.orgName || '')).trim();
+  const hours = culturalEvent.proTime || culturalEvent.date || '';
+  const price = culturalEvent.useFee || '';
+  const website = culturalEvent.website || culturalEvent.hmpgAddr || culturalEvent.orgLink || '';
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -59,8 +59,8 @@ export function ExhibitionDetail({ exhibition, open, onClose }: ExhibitionDetail
 
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Badge>{getCodenameLabel(exhibition.codename)}</Badge>
-              {exhibition.isFree && <Badge variant="secondary">무료 관람</Badge>}
+              <Badge>{getCodenameLabel(culturalEvent.codename)}</Badge>
+              {culturalEvent.isFree && <Badge variant="secondary">무료 관람</Badge>}
             </div>
 
             <div>
@@ -87,7 +87,8 @@ export function ExhibitionDetail({ exhibition, open, onClose }: ExhibitionDetail
               <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-muted-foreground shrink-0" />
                 <p>
-                  {safeFormatDate(exhibition.startDate)} - {safeFormatDate(exhibition.endDate)}
+                  {safeFormatDate(culturalEvent.startDate)} -{' '}
+                  {safeFormatDate(culturalEvent.endDate)}
                 </p>
               </div>
 

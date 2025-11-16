@@ -1,4 +1,4 @@
-export interface Exhibition {
+export interface CulturalEvent {
   id: string;
   codename?: string; // CODENAME (분류)
   guname?: string; // GUNAME (자치구)

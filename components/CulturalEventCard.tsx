@@ -1,8 +1,8 @@
-import { Exhibition } from '../types/exhibition';
+import { CulturalEvent } from '@/lib/types/culturalEvent';
 import { Calendar, MapPin } from 'lucide-react';
 
-interface ExhibitionCardProps {
-  exhibition: Exhibition;
+interface CulturalEventCardProps {
+  culturalEvent: CulturalEvent;
   onClick: () => void;
 }
 
@@ -23,16 +23,16 @@ function getCodenameLabel(codename?: string) {
   return codename && codename.trim().length > 0 ? codename : '분류 없음';
 }
 
-export function ExhibitionCard({ exhibition, onClick }: ExhibitionCardProps) {
-  const ratio = pickRatio(exhibition.id);
+export function CulturalEventCard({ culturalEvent, onClick }: CulturalEventCardProps) {
+  const ratio = pickRatio(culturalEvent.id);
 
-  const title = exhibition.title || '제목 없음';
+  const title = culturalEvent.title || '제목 없음';
   // culturalEventInfo: 출연자정보는 PLAYER, 기관명은 ORG_NAME
-  const actorOrOrg = (exhibition.player || exhibition.orgName || '').trim();
-  const venue = exhibition.place || '장소 정보 없음';
-  const start = formatShort(exhibition.startDate);
-  const end = formatShort(exhibition.endDate);
-  const image = exhibition.imageUrl || '/placeholder.png';
+  const actorOrOrg = (culturalEvent.player || culturalEvent.orgName || '').trim();
+  const venue = culturalEvent.place || '장소 정보 없음';
+  const start = formatShort(culturalEvent.startDate);
+  const end = formatShort(culturalEvent.endDate);
+  const image = culturalEvent.imageUrl || '/placeholder.png';
 
   return (
     <div
@@ -54,9 +54,9 @@ export function ExhibitionCard({ exhibition, onClick }: ExhibitionCardProps) {
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex flex-col justify-end p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-white/90 text-[11px] px-2 py-0.5 rounded bg-white/10">
-              {getCodenameLabel(exhibition.codename)}
+              {getCodenameLabel(culturalEvent.codename)}
             </span>
-            {exhibition.isFree && (
+            {culturalEvent.isFree && (
               <span className="text-white/90 text-[11px] px-2 py-0.5 rounded bg-green-600/70">
                 무료
               </span>

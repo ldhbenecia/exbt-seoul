@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Exhibition } from '@/types/exhibition';
-import { ExhibitionCard } from '@/components/ExhibitionCard';
-import { ExhibitionDetail } from '@/components/ExhibitionDetail';
+
 import { FilterBar } from '@/components/FilterBar';
 
 import { Button } from '@/components/ui/button';
-import { useExhibitions } from '@/hooks/useExhibitions';
+import { useEvents } from '@/hooks/useEvents';
+import { CulturalEvent } from '@/lib/types/culturalEvent';
+import { CulturalEventDetail } from '@/components/CulturalEventDetail';
+import { CulturalEventCard } from '@/components/CulturalEventCard';
 
 type CodenameTab =
   | '전시/미술'
@@ -28,17 +29,17 @@ type CodenameTab =
 export default function Home() {
   const [codename, setCodename] = useState<CodenameTab>('전시/미술');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null);
+  const [selectedCulturalEvent, setSelectedCulturalEvent] = useState<CulturalEvent | null>(null);
 
   const {
-    items: exhibitions,
+    items: culturalEvents,
     isLoading,
     error,
     total,
     hasMore,
     loadNext,
     reset,
-  } = useExhibitions(1, 20, codename, /* title */ '', /* date */ '');
+  } = useEvents(1, 20, codename, /* title */ '', /* date */ '');
 
   const heroRef = useRef<HTMLDivElement>(null);
   const [showFixedHeader, setShowFixedHeader] = useState(false);
@@ -55,20 +56,20 @@ export default function Home() {
     };
   }, []);
 
-  const filteredExhibitions = useMemo(() => {
-    const list = exhibitions || [];
+  const filteredEvents = useMemo(() => {
+    const list = culturalEvents || [];
     const q = (searchQuery || '').toLowerCase().trim();
     if (!q) return list;
-    return list.filter((ex) => {
-      const title = (ex.title || '').toLowerCase();
-      const actorOrOrg = ((ex.player || '') + ' ' + (ex.orgName || '')).toLowerCase();
-      const venue = (ex.place || '').toLowerCase();
+    return list.filter((event) => {
+      const title = (event.title || '').toLowerCase();
+      const actorOrOrg = ((event.player || '') + ' ' + (event.orgName || '')).toLowerCase();
+      const venue = (event.place || '').toLowerCase();
       return title.includes(q) || actorOrOrg.includes(q) || venue.includes(q);
     });
-  }, [exhibitions, searchQuery]);
+  }, [culturalEvents, searchQuery]); //
 
-  const scrollToExhibitions = () => {
-    document.getElementById('exhibitions-section')?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToEvents = () => {
+    document.getElementById('events-section')?.scrollIntoView({ behavior: 'smooth' }); // 👈 id 변경
   };
 
   return (
@@ -92,7 +93,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-4 sm:pt-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
             <Button
-              onClick={scrollToExhibitions}
+              onClick={scrollToEvents}
               className="sm:w-auto px-8 py-5 text-sm font-medium rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-all border-0"
             >
               행사 둘러보기
@@ -103,7 +104,7 @@ export default function Home() {
 
       {/* List */}
       <main
-        id="exhibitions-section"
+        id="events-section"
         className="container mx-auto px-4 sm:max-w-2xl lg:max-w-5xl py-16 md:py-20 lg:py-24 trasition-all duration-300"
       >
         {showFixedHeader && (
@@ -126,11 +127,11 @@ export default function Home() {
           />
         </div>
 
-        {!isLoading && !error && filteredExhibitions.length > 0 && (
+        {!isLoading && !error && filteredEvents.length > 0 && (
           <div className="mb-4 ml-1 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
             <p className="text-sm lg:text-base text-muted-foreground">
-              <span className="font-medium text-foreground">{filteredExhibitions.length}개</span> /
-              총 {total}개
+              <span className="font-medium text-foreground">{filteredEvents.length}개</span> / 총{' '}
+              {total}개
             </p>
           </div>
         )}
@@ -151,7 +152,7 @@ export default function Home() {
           </div>
         )}
 
-        {!isLoading && !error && filteredExhibitions.length === 0 && (
+        {!isLoading && !error && filteredEvents.length === 0 && (
           <div className="text-center py-24 sm:py-32">
             <p className="text-muted-foreground text-base sm:text-lg">검색 결과가 없습니다</p>
             <p className="text-muted-foreground/70 mt-2 text-sm">
@@ -160,18 +161,18 @@ export default function Home() {
           </div>
         )}
 
-        {!isLoading && !error && filteredExhibitions.length > 0 && (
+        {!isLoading && !error && filteredEvents.length > 0 && (
           <>
             <div className="columns-2 lg:columns-3 gap-4">
-              {filteredExhibitions.map((exhibition, index) => (
+              {filteredEvents.map((event, index) => (
                 <div
-                  key={exhibition.id}
+                  key={event.id}
                   className="animate-in fade-in slide-in-from-bottom-6 duration-700"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <ExhibitionCard
-                    exhibition={exhibition}
-                    onClick={() => setSelectedExhibition(exhibition)}
+                  <CulturalEventCard
+                    culturalEvent={event}
+                    onClick={() => setSelectedCulturalEvent(event)}
                   />
                 </div>
               ))}
@@ -186,10 +187,10 @@ export default function Home() {
         )}
       </main>
 
-      <ExhibitionDetail
-        exhibition={selectedExhibition}
-        open={!!selectedExhibition}
-        onClose={() => setSelectedExhibition(null)}
+      <CulturalEventDetail
+        culturalEvent={selectedCulturalEvent}
+        open={!!selectedCulturalEvent}
+        onClose={() => setSelectedCulturalEvent(null)}
       />
     </div>
   );

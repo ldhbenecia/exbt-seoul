@@ -1,5 +1,5 @@
+import { getPaginatedEvents } from '@/lib/services/exhibitionService';
 import { NextResponse } from 'next/server';
-import { fetchEventsPage } from '@/lib/clients';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 120;
@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     const title = url.searchParams.get('title') ?? '';
     const date = url.searchParams.get('date') ?? '';
 
-    const { data, meta } = await fetchEventsPage({ page, pageSize, codename, title, date });
+    const { data, meta } = await getPaginatedEvents({ page, pageSize, codename, title, date });
 
     return NextResponse.json(
       { data, meta },
