@@ -8,24 +8,23 @@ import { Calendar, MapPin } from 'lucide-react';
 
 interface EventCardProps {
   event: CulturalEvent;
+  priority?: boolean;
   onClick: () => void;
 }
 
-export function EventCard({ event, onClick }: EventCardProps) {
+export function EventCard({ event, priority = false, onClick }: EventCardProps) {
   const title = event.title || '제목 없음';
   const venue = event.place || '장소 정보 없음';
   const start = formatShortDate(event.startDate);
   const end = formatShortDate(event.endDate);
 
   return (
-    <article
-      className="group cursor-pointer overflow-hidden rounded-xl bg-card border border-border/50 hover:shadow-lg hover:shadow-black/5 transition-all duration-300"
-      onClick={onClick}
-    >
-      <div className="relative aspect-[3/4] overflow-hidden">
+    <article className="overflow-hidden rounded-xl bg-card border border-border/50">
+      <div className="relative aspect-[3/4] overflow-hidden cursor-pointer group" onClick={onClick}>
         <ImageWithFallback
           src={event.imageUrl}
           alt={title}
+          priority={priority}
           className="group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-2 left-2 flex items-center gap-1.5">
