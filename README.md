@@ -28,8 +28,8 @@ EXBT는 서울시 공공데이터를 활용하여 전시, 공연, 축제 등 다
 
 ### Technical Highlights
 
-- **성능 최적화** - 서버 사이드 캐싱 (5분 TTL) 및 병렬 데이터 페칭
-- **Progressive Loading** - 무한 스크롤 기반 점진적 데이터 로딩
+- **성능 최적화** - Next.js fetch revalidate (1시간) + API Route Cache-Control (2분)
+- **Progressive Loading** - 페이지네이션 기반 점진적 데이터 로딩 (더 보기)
 - **타입 안정성** - TypeScript 기반 엔드투엔드 타입 체킹
 - **SEO 최적화** - Next.js App Router 기반 서버 사이드 렌더링
 
@@ -48,7 +48,7 @@ EXBT는 서울시 공공데이터를 활용하여 전시, 공연, 축제 등 다
 
 - **API Routes** - Next.js API Routes (Server Components)
 - **Data Source** - Seoul Open API (서울시 문화행사 정보)
-- **Caching** - In-memory cache with TTL
+- **Caching** - Next.js fetch revalidate + HTTP Cache-Control
 
 ### Development
 
@@ -85,10 +85,7 @@ cp .env.example .env.local
 
 ```env
 # Seoul Open API Key (Required)
-SEOUL_API_KEY=your_api_key_here
-
-# Optional: Custom API endpoint
-SEOUL_API_ENDPOINT=http://openapi.seoul.go.kr:8088
+SEOUL_OPEN_API_KEY=your_api_key_here
 ```
 
 > **서울 열린데이터광장**에서 API 키를 발급받을 수 있습니다:  
@@ -115,6 +112,27 @@ npm start
 
 ## Architecture
 
+### Project Structure
+
+```
+app/
+  api/events/route.ts    - API 엔드포인트
+  layout.tsx             - 루트 레이아웃
+  page.tsx               - 메인 페이지
+components/
+  CulturalEventCard.tsx  - 행사 카드 (메이슨리 그리드)
+  CulturalEventDetail.tsx - 행사 상세 (다이얼로그)
+  FilterBar.tsx          - 카테고리 탭 + 검색
+  ui/                    - shadcn/ui 기본 컴포넌트
+hooks/
+  useEvents.ts           - 행사 데이터 페칭 훅
+lib/
+  data/seoul/            - Seoul Open API 클라이언트 & 매퍼
+  services/eventService.ts - 비즈니스 로직
+  types/culturalEvent.ts - 도메인 타입
+  utils/dateUtils.ts     - 유틸리티 함수
+```
+
 ### Data Flow
 
 ```
@@ -133,28 +151,14 @@ Seoul Open API
 [React Components] - UI 렌더링
 ```
 
-## Deployment (Not yet)
-
-1. GitHub 저장소와 연동
-2. 환경 변수 설정 (`SEOUL_API_KEY`)
-3. 자동 배포 완료
-
-### Docker
-
-```bash
-# Build image
-docker build -t exbt-seoul .
-
-# Run container
-docker run -p 3000:3000 -e SEOUL_API_KEY=your_key exbt-seoul
-```
-
-### Manual Deployment
+## Deployment
 
 ```bash
 npm run build
 npm start
 ```
+
+배포 시 `SEOUL_OPEN_API_KEY` 환경 변수 설정이 필요합니다.
 
 ## Contributing
 
