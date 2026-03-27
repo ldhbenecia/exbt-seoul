@@ -1,7 +1,8 @@
 'use client';
 
 import { CulturalEvent } from '@/lib/types/culturalEvent';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { CODENAME_TO_SLUG, CodenameTab } from '@/lib/constants/codenames';
 
 type EventsResponse = {
   data: CulturalEvent[];
@@ -11,39 +12,40 @@ type EventsResponse = {
 export function useEvents(
   initialPage = 1,
   initialPageSize = 20,
-  codename = '',
+  codename: CodenameTab | '' = '',
   title = '',
   date = ''
 ) {
   const [items, setItems] = useState<CulturalEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusCode, setStatusCode] = useState<number | null>(null);
-  const [page, setPage] = useState(initialPage);
-  const [pageSize] = useState(initialPageSize);
   const [total, setTotal] = useState(0);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const pageRef = useRef(initialPage);
+  const fetchIdRef = useRef(0);
+  const hasFetchedRef = useRef(false);
 
   const hasMore = items.length < total;
 
-  useEffect(() => {
-    let cancelled = false;
-    async function fetchPage() {
+  const fetchData = useCallback(
+    async (page: number, append: boolean) => {
+      const id = ++fetchIdRef.current;
+      setError(null);
+
       try {
-        setIsLoading(true);
-        setError(null);
-        setStatusCode(null);
+        const slug = codename ? (CODENAME_TO_SLUG[codename as CodenameTab] ?? '') : '';
 
         const qs = new URLSearchParams({
           page: String(page),
-          pageSize: String(pageSize),
+          pageSize: String(initialPageSize),
         });
-        if (codename) qs.set('codename', codename);
+        if (slug) qs.set('codename', slug);
         if (title) qs.set('title', title);
         if (date) qs.set('date', date);
 
         const res = await fetch(`/api/events?${qs.toString()}`);
+        if (id !== fetchIdRef.current) return;
+
         if (!res.ok) {
-          setStatusCode(res.status);
           if (res.status === 404) throw new Error('현재 수집된 정보가 없습니다.');
           if (res.status === 503)
             throw new Error('서비스가 일시적으로 불가능합니다. 잠시 후 다시 시도해주세요.');
@@ -51,41 +53,43 @@ export function useEvents(
         }
 
         const { data, meta } = (await res.json()) as EventsResponse;
-        if (cancelled) return;
+        if (id !== fetchIdRef.current) return;
 
-        setItems((prev) => (page === initialPage ? data : [...prev, ...data]));
+        setItems((prev) => (append ? [...prev, ...data] : data));
         setTotal(meta.total);
       } catch (err) {
-        if (cancelled) return;
+        if (id !== fetchIdRef.current) return;
+        setItems([]);
+        setTotal(0);
         setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
-        console.error('Error fetching events:', err);
-        setItems((prev) => prev);
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (id === fetchIdRef.current) {
+          if (!hasFetchedRef.current) {
+            hasFetchedRef.current = true;
+            setInitialLoading(false);
+          }
+        }
       }
-    }
-    fetchPage();
-    return () => {
-      cancelled = true;
-    };
-  }, [page, pageSize, codename, title, date, initialPage]);
+    },
+    [codename, title, date, initialPageSize]
+  );
+
+  useEffect(() => {
+    pageRef.current = initialPage;
+    fetchData(initialPage, false);
+  }, [fetchData, initialPage]);
 
   return {
     items,
-    isLoading,
+    initialLoading,
     error,
-    statusCode,
     total,
-    page,
-    pageSize,
     hasMore,
     loadNext: () => {
-      if (hasMore && !isLoading) setPage((p) => p + 1);
-    },
-    reset: () => {
-      setPage(initialPage);
-      setItems([]);
-      setTotal(0);
+      if (hasMore) {
+        pageRef.current += 1;
+        fetchData(pageRef.current, true);
+      }
     },
   };
 }

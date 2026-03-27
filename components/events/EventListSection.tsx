@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useEvents } from '@/hooks/useEvents';
 import { useDebounce } from '@/hooks/useDebounce';
 import { CulturalEvent } from '@/lib/types/culturalEvent';
-import { CodenameTab } from '@/lib/constants/codenames';
+import { CodenameTab, FESTIVAL_CODENAMES } from '@/lib/constants/codenames';
 import { FilterBar } from '@/components/events/FilterBar';
 import { EventCard } from '@/components/events/EventCard';
 import { EventGrid } from '@/components/events/EventGrid';
@@ -20,58 +20,81 @@ export function EventListSection() {
 
   const debouncedSearch = useDebounce(searchQuery);
 
-  const { items, isLoading, error, total, hasMore, loadNext, reset } = useEvents(
+  const { items, initialLoading, error, total, hasMore, loadNext } = useEvents(
     1,
     20,
-    codename === '전체' ? '' : codename,
+    codename,
     debouncedSearch
   );
 
-  return (
-    <div className="space-y-6">
-      <FilterBar
-        codename={codename}
-        onCodenameChange={(c) => {
-          setCodename(c);
-          reset();
-        }}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+  const filteredItems =
+    codename === '축제'
+      ? items.filter((e) => FESTIVAL_CODENAMES.includes(e.codename ?? ''))
+      : items;
 
-      {!isLoading && !error && items.length > 0 && (
-        <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">{items.length}개</span> / 총 {total}개
-        </p>
-      )}
-
-      {isLoading && (
+  if (initialLoading) {
+    return (
+      <div className="space-y-6">
+        <FilterBar
+          codename={codename}
+          onCodenameChange={setCodename}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
         <EventGrid>
           {Array.from({ length: 8 }).map((_, i) => (
             <EventCardSkeleton key={i} />
           ))}
         </EventGrid>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <FilterBar
+        codename={codename}
+        onCodenameChange={setCodename}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
+
+      {!error && filteredItems.length > 0 && (
+        <p className="text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">{filteredItems.length}개</span> / 총 {total}
+          개
+        </p>
       )}
 
-      {error && (
-        <div className="text-center py-16">
-          <p className="text-destructive font-medium">정보를 불러오는데 실패했습니다</p>
-          <p className="text-muted-foreground mt-2 text-sm">{error}</p>
+      {error && filteredItems.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 gap-3">
+          <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
+            <span className="text-destructive text-xl">!</span>
+          </div>
+          <p className="text-destructive font-medium">{error}</p>
+          <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+            다시 시도
+          </Button>
         </div>
       )}
 
-      {!isLoading && !error && items.length === 0 && <EventEmptyState />}
+      {!error && filteredItems.length === 0 && <EventEmptyState />}
 
-      {!isLoading && !error && items.length > 0 && (
+      {filteredItems.length > 0 && (
         <>
           <EventGrid>
-            {items.map((event) => (
-              <EventCard key={event.id} event={event} onClick={() => setSelectedEvent(event)} />
+            {filteredItems.map((event, i) => (
+              <EventCard
+                key={event.id}
+                event={event}
+                priority={i < 4}
+                onClick={() => setSelectedEvent(event)}
+              />
             ))}
           </EventGrid>
 
           <div className="flex justify-center pt-4">
-            <Button onClick={loadNext} disabled={!hasMore || isLoading} variant="outline">
+            <Button onClick={loadNext} disabled={!hasMore} variant="outline">
               {hasMore ? '더 보기' : '더 이상 결과가 없습니다'}
             </Button>
           </div>
