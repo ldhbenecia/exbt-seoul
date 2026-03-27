@@ -1,4 +1,5 @@
 export const CODENAME_TABS = [
+  '전체',
   '전시/미술',
   '클래식',
   '무용',

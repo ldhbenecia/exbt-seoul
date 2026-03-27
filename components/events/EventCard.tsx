@@ -1,75 +1,58 @@
+'use client';
+
 import { CulturalEvent } from '@/lib/types/culturalEvent';
 import { formatShortDate, getCodenameLabel } from '@/lib/utils/dateUtils';
+import { ImageWithFallback } from '@/components/common/ImageWithFallback';
+import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin } from 'lucide-react';
 
-interface CulturalEventCardProps {
-  culturalEvent: CulturalEvent;
+interface EventCardProps {
+  event: CulturalEvent;
   onClick: () => void;
 }
 
-const aspectRatios = ['1/1', '3/4', '4/5', '2/3', '5/4', '4/3', '3/2', '5/3', '3/5'];
-function pickRatio(id: string) {
-  const hash = Array.from(id).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-  return aspectRatios[hash % aspectRatios.length];
-}
-
-export function CulturalEventCard({ culturalEvent, onClick }: CulturalEventCardProps) {
-  const ratio = pickRatio(culturalEvent.id);
-
-  const title = culturalEvent.title || '제목 없음';
-  // culturalEventInfo: 출연자정보는 PLAYER, 기관명은 ORG_NAME
-  const actorOrOrg = (culturalEvent.player || culturalEvent.orgName || '').trim();
-  const venue = culturalEvent.place || '장소 정보 없음';
-  const start = formatShortDate(culturalEvent.startDate);
-  const end = formatShortDate(culturalEvent.endDate);
-  const image = culturalEvent.imageUrl || '/placeholder.png';
+export function EventCard({ event, onClick }: EventCardProps) {
+  const title = event.title || '제목 없음';
+  const venue = event.place || '장소 정보 없음';
+  const start = formatShortDate(event.startDate);
+  const end = formatShortDate(event.endDate);
 
   return (
-    <div
-      className="group relative overflow-hidden bg-card transition-all cursor-pointer border-transparent mb-6"
+    <article
+      className="group cursor-pointer overflow-hidden rounded-xl bg-card border border-border/50 hover:shadow-lg hover:shadow-black/5 transition-all duration-300"
       onClick={onClick}
     >
-      <div
-        className={`overflow-hidden rounded-xl aspect-[${ratio}]`}
-        style={{ aspectRatio: ratio }}
-      >
-        <img
-          src={image}
+      <div className="relative aspect-[3/4] overflow-hidden">
+        <ImageWithFallback
+          src={event.imageUrl}
           alt={title}
-          className="w-full h-full m-auto rounded-xl object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
+          className="group-hover:scale-105 transition-transform duration-500"
         />
+        <div className="absolute top-2 left-2 flex items-center gap-1.5">
+          <Badge variant="secondary" className="text-[11px] backdrop-blur-sm bg-background/70">
+            {getCodenameLabel(event.codename)}
+          </Badge>
+          {event.isFree && (
+            <Badge className="text-[11px] bg-green-600/80 text-white backdrop-blur-sm">무료</Badge>
+          )}
+        </div>
+      </div>
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex flex-col justify-end p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-white/90 text-[11px] px-2 py-0.5 rounded bg-white/10">
-              {getCodenameLabel(culturalEvent.codename)}
-            </span>
-            {culturalEvent.isFree && (
-              <span className="text-white/90 text-[11px] px-2 py-0.5 rounded bg-green-600/70">
-                무료
-              </span>
-            )}
+      <div className="p-3 space-y-1.5">
+        <h3 className="text-sm font-semibold line-clamp-2 leading-snug">{title}</h3>
+        <div className="text-xs text-muted-foreground space-y-1">
+          <div className="flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="line-clamp-1">{venue}</span>
           </div>
-
-          <h3 className="text-white text-sm sm:text-lg font-semibold line-clamp-2">{title}</h3>
-          {actorOrOrg && <p className="text-white/80 text-sm mt-1 line-clamp-1">{actorOrOrg}</p>}
-
-          <div className="text-white/80 text-xs mt-2 space-y-1">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 shrink-0" />
-              <span className="line-clamp-1">{venue}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 shrink-0" />
-              <span>
-                {start} - {end}
-              </span>
-            </div>
+          <div className="flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 shrink-0" />
+            <span>
+              {start} - {end}
+            </span>
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

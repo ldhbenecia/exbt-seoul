@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react';
 import { CulturalEvent } from '@/lib/types/culturalEvent';
 import { formatFullDate, getCodenameLabel } from '@/lib/utils/dateUtils';
+import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 
 interface CulturalEventDetailProps {
   culturalEvent: CulturalEvent | null;
@@ -15,7 +16,7 @@ export function CulturalEventDetail({ culturalEvent, open, onClose }: CulturalEv
   if (!culturalEvent) return null;
 
   const title = culturalEvent.title || '제목 없음';
-  const imageSrc = culturalEvent.imageUrl || '/placeholder.png';
+  const imageSrc = culturalEvent.imageUrl;
   const venue = culturalEvent.place || '장소 정보 없음';
   const gu = culturalEvent.guname || ''; // 자치구
   const description =
@@ -37,13 +38,8 @@ export function CulturalEventDetail({ culturalEvent, open, onClose }: CulturalEv
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="overflow-hidden rounded-lg">
-            <img
-              src={imageSrc}
-              alt={title}
-              className="w-full sm:w-2/3 h-full m-auto rounded-lg object-cover"
-              loading="lazy"
-            />
+          <div className="relative overflow-hidden rounded-lg aspect-[3/4] sm:aspect-[4/5] max-w-sm mx-auto">
+            <ImageWithFallback src={imageSrc} alt={title} />
           </div>
 
           <div className="space-y-4">
