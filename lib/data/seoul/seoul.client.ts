@@ -6,10 +6,14 @@ function getApiKey(): string {
   return key;
 }
 
+type SeoulApiResult<T> = {
+  rows: T[];
+  totalCount: number;
+};
+
 /**
  * Seoul Open API 제네릭 클라이언트
- * 모든 서울시 공공데이터 API는 동일한 URL 패턴을 사용:
- * {BASE}/{KEY}/json/{SERVICE}/{START}/{END}/{...filters}
+ * URL 패턴: {BASE}/{KEY}/json/{SERVICE}/{START}/{END}/{...filters}
  */
 export async function fetchSeoulApi<T>(
   serviceName: string,
@@ -17,7 +21,7 @@ export async function fetchSeoulApi<T>(
   end: number,
   filters: string[] = [],
   cacheTag?: string
-): Promise<T[]> {
+): Promise<SeoulApiResult<T>> {
   const filterPath =
     filters.length > 0
       ? '/' + filters.map((f) => (f ? encodeURIComponent(f) : '%20')).join('/')
@@ -37,10 +41,12 @@ export async function fetchSeoulApi<T>(
   const json = await res.json();
   const box = json?.[serviceName];
 
-  if (!box) return [];
+  if (!box) return { rows: [], totalCount: 0 };
 
   const rows: T[] = Array.isArray(box.row) ? box.row : [];
-  return rows;
+  const totalCount = box.list_total_count ?? rows.length;
+
+  return { rows, totalCount };
 }
 
 // culturalEventInfo 전용 래퍼 (기존 호환)
@@ -50,7 +56,7 @@ export async function fetchSeoulRawEvents(filters: {
   codename?: string;
   title?: string;
   date?: string;
-}): Promise<SeoulApiRawRow[]> {
+}): Promise<SeoulApiResult<SeoulApiRawRow>> {
   return fetchSeoulApi<SeoulApiRawRow>(
     'culturalEventInfo',
     1,

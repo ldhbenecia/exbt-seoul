@@ -13,30 +13,23 @@ export async function getPaginatedReservations(params: {
   const page = Math.max(1, params.page ?? 1);
   const pageSize = Math.min(100, Math.max(1, params.pageSize ?? 20));
 
-  const allRows = await fetchSeoulApi<SeoulReservationRawRow>(
+  const start = (page - 1) * pageSize + 1;
+  const end = start + pageSize - 1;
+
+  const { rows, totalCount } = await fetchSeoulApi<SeoulReservationRawRow>(
     'ListPublicReservationCulture',
-    1,
-    1000,
+    start,
+    end,
     [],
     'seoul-reservations'
   );
 
-  // 접수중인 항목만 필터
-  const activeRows = allRows.filter((r) => {
-    const status = (r.SVCSTATNM ?? '').trim();
-    return status === '접수중' || status === '안내중';
-  });
-
-  const startIdx = (page - 1) * pageSize;
-  const endIdx = startIdx + pageSize;
-  const pagedRows = activeRows.slice(startIdx, endIdx);
-
-  const data = pagedRows
-    .map((r, idx) => mapSeoulRowToReservation(r, startIdx + idx))
+  const data = rows
+    .map((r, idx) => mapSeoulRowToReservation(r, start - 1 + idx))
     .filter((x): x is Reservation => x !== null);
 
   return {
     data,
-    meta: { total: activeRows.length, page, pageSize, count: data.length },
+    meta: { total: totalCount, page, pageSize, count: data.length },
   };
 }

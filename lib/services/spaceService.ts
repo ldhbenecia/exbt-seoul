@@ -10,24 +10,23 @@ export async function getPaginatedSpaces(params: { page?: number; pageSize?: num
   const page = Math.max(1, params.page ?? 1);
   const pageSize = Math.min(100, Math.max(1, params.pageSize ?? 20));
 
-  const allRows = await fetchSeoulApi<SeoulSpaceRawRow>(
+  const start = (page - 1) * pageSize + 1;
+  const end = start + pageSize - 1;
+
+  const { rows, totalCount } = await fetchSeoulApi<SeoulSpaceRawRow>(
     'culturalSpaceInfo',
-    1,
-    1000,
+    start,
+    end,
     [],
     'seoul-spaces'
   );
 
-  const startIdx = (page - 1) * pageSize;
-  const endIdx = startIdx + pageSize;
-  const pagedRows = allRows.slice(startIdx, endIdx);
-
-  const data = pagedRows
-    .map((r, idx) => mapSeoulRowToSpace(r, startIdx + idx))
+  const data = rows
+    .map((r, idx) => mapSeoulRowToSpace(r, start - 1 + idx))
     .filter((x): x is CulturalSpace => x !== null);
 
   return {
     data,
-    meta: { total: allRows.length, page, pageSize, count: data.length },
+    meta: { total: totalCount, page, pageSize, count: data.length },
   };
 }

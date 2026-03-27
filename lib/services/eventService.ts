@@ -18,7 +18,7 @@ export async function getPaginatedEvents(params: {
   const requestedPageSize = Math.min(100, Math.max(1, params.pageSize ?? 20));
   const dateFilter = params.date || getTodayDateString();
 
-  const allRows = await fetchSeoulRawEvents({
+  const { rows: allRows } = await fetchSeoulRawEvents({
     codename: params.codename ?? '',
     title: params.title ?? '',
     date: dateFilter,
