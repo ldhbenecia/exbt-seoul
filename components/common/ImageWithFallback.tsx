@@ -13,6 +13,7 @@ interface ImageWithFallbackProps {
   height?: number;
   className?: string;
   sizes?: string;
+  priority?: boolean;
 }
 
 export function ImageWithFallback({
@@ -23,9 +24,9 @@ export function ImageWithFallback({
   height,
   className,
   sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
+  priority = false,
 }: ImageWithFallbackProps) {
   const [hasError, setHasError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   if (!src || hasError) {
     return (
@@ -38,27 +39,17 @@ export function ImageWithFallback({
   }
 
   return (
-    <>
-      {isLoading && <div className={cn('absolute inset-0 animate-pulse bg-muted', className)} />}
-      <Image
-        src={src}
-        alt={alt}
-        fill={fill}
-        width={fill ? undefined : width}
-        height={fill ? undefined : height}
-        sizes={sizes}
-        className={cn(
-          'object-cover transition-opacity duration-300',
-          isLoading ? 'opacity-0' : 'opacity-100',
-          className
-        )}
-        onLoad={() => setIsLoading(false)}
-        onError={() => {
-          setHasError(true);
-          setIsLoading(false);
-        }}
-        unoptimized
-      />
-    </>
+    <Image
+      src={src}
+      alt={alt}
+      fill={fill}
+      width={fill ? undefined : width}
+      height={fill ? undefined : height}
+      sizes={sizes}
+      priority={priority}
+      className={cn('object-cover', className)}
+      onError={() => setHasError(true)}
+      unoptimized
+    />
   );
 }
