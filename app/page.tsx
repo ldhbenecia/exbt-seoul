@@ -2,29 +2,13 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 
-import { FilterBar } from '@/components/FilterBar';
+import { FilterBar, CodenameTab } from '@/components/FilterBar';
 
 import { Button } from '@/components/ui/button';
 import { useEvents } from '@/hooks/useEvents';
 import { CulturalEvent } from '@/lib/types/culturalEvent';
 import { CulturalEventDetail } from '@/components/CulturalEventDetail';
 import { CulturalEventCard } from '@/components/CulturalEventCard';
-
-type CodenameTab =
-  | '전시/미술'
-  | '클래식'
-  | '무용'
-  | '연극'
-  | '콘서트'
-  | '뮤지컬/오페라'
-  | '국악'
-  | '교육/체험'
-  | '영화'
-  | '축제-문화/예술'
-  | '축제-시민화합'
-  | '축제-자연/경관'
-  | '축제-전통/역사'
-  | '기타';
 
 export default function Home() {
   const [codename, setCodename] = useState<CodenameTab>('전시/미술');
@@ -105,7 +89,7 @@ export default function Home() {
       {/* List */}
       <main
         id="events-section"
-        className="container mx-auto px-4 sm:max-w-2xl lg:max-w-5xl py-16 md:py-20 lg:py-24 trasition-all duration-300"
+        className="container mx-auto px-4 sm:max-w-2xl lg:max-w-5xl py-16 md:py-20 lg:py-24 transition-all duration-300"
       >
         {showFixedHeader && (
           <h1 className="fixed top-0 left-1/2 -translate-x-1/2 text-2xl md:text-3xl lg:text-4xl font-bold z-50 animate-in fade-in duration-500 text-foreground bg-background w-full py-3 md:py-4 px-4 text-center max-h-20">

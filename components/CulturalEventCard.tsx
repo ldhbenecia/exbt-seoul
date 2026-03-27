@@ -1,4 +1,5 @@
 import { CulturalEvent } from '@/lib/types/culturalEvent';
+import { formatShortDate, getCodenameLabel } from '@/lib/utils/dateUtils';
 import { Calendar, MapPin } from 'lucide-react';
 
 interface CulturalEventCardProps {
@@ -6,21 +7,10 @@ interface CulturalEventCardProps {
   onClick: () => void;
 }
 
-// ID 기반 일관된 ratio 선택(랜덤 제거로 레이아웃 안정)
 const aspectRatios = ['1/1', '3/4', '4/5', '2/3', '5/4', '4/3', '3/2', '5/3', '3/5'];
 function pickRatio(id: string) {
   const hash = Array.from(id).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
   return aspectRatios[hash % aspectRatios.length];
-}
-
-function formatShort(dateString?: string) {
-  if (!dateString) return '-';
-  const d = new Date(dateString);
-  return isNaN(d.getTime()) ? '-' : `${d.getMonth() + 1}.${d.getDate()}`;
-}
-
-function getCodenameLabel(codename?: string) {
-  return codename && codename.trim().length > 0 ? codename : '분류 없음';
 }
 
 export function CulturalEventCard({ culturalEvent, onClick }: CulturalEventCardProps) {
@@ -30,8 +20,8 @@ export function CulturalEventCard({ culturalEvent, onClick }: CulturalEventCardP
   // culturalEventInfo: 출연자정보는 PLAYER, 기관명은 ORG_NAME
   const actorOrOrg = (culturalEvent.player || culturalEvent.orgName || '').trim();
   const venue = culturalEvent.place || '장소 정보 없음';
-  const start = formatShort(culturalEvent.startDate);
-  const end = formatShort(culturalEvent.endDate);
+  const start = formatShortDate(culturalEvent.startDate);
+  const end = formatShortDate(culturalEvent.endDate);
   const image = culturalEvent.imageUrl || '/placeholder.png';
 
   return (

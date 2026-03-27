@@ -3,23 +3,12 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Calendar, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react';
 import { CulturalEvent } from '@/lib/types/culturalEvent';
+import { formatFullDate, getCodenameLabel } from '@/lib/utils/dateUtils';
 
 interface CulturalEventDetailProps {
   culturalEvent: CulturalEvent | null;
   open: boolean;
   onClose: () => void;
-}
-
-function safeFormatDate(date?: string) {
-  if (!date) return '정보 없음';
-  const d = new Date(date);
-  return isNaN(d.getTime())
-    ? '정보 없음'
-    : `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
-}
-
-function getCodenameLabel(codename?: string) {
-  return codename && codename.trim().length > 0 ? codename : '분류 없음';
 }
 
 export function CulturalEventDetail({ culturalEvent, open, onClose }: CulturalEventDetailProps) {
@@ -87,8 +76,8 @@ export function CulturalEventDetail({ culturalEvent, open, onClose }: CulturalEv
               <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-muted-foreground shrink-0" />
                 <p>
-                  {safeFormatDate(culturalEvent.startDate)} -{' '}
-                  {safeFormatDate(culturalEvent.endDate)}
+                  {formatFullDate(culturalEvent.startDate)} -{' '}
+                  {formatFullDate(culturalEvent.endDate)}
                 </p>
               </div>
 
