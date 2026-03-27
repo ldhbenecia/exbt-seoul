@@ -1,7 +1,6 @@
 import { getPaginatedEvents } from '@/lib/services/eventService';
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
 export const revalidate = 120;
 
 export async function GET(req: Request) {
@@ -15,16 +14,7 @@ export async function GET(req: Request) {
 
     const { data, meta } = await getPaginatedEvents({ page, pageSize, codename, title, date });
 
-    return NextResponse.json(
-      { data, meta },
-      {
-        headers: {
-          'Cache-Control': 'public, max-age=120, s-maxage=120',
-          ETag: `"evt-p${meta.page}-s${meta.pageSize}-c${meta.count}"`,
-          'Last-Modified': new Date().toUTCString(),
-        },
-      }
-    );
+    return NextResponse.json({ data, meta });
   } catch (error) {
     console.error('Error fetching events:', error);
     return NextResponse.json(

@@ -1,56 +1,58 @@
-import { SeoulApiRawRow } from './types/culturalEvent.types';
-
 const KEY = process.env.SEOUL_OPEN_API_KEY!;
 if (!KEY) throw new Error('Missing SEOUL_OPEN_API_KEY');
 
-function buildUrl(
+const BASE_URL = 'http://openapi.seoul.go.kr:8088';
+
+/**
+ * Seoul Open API 제네릭 클라이언트
+ * 모든 서울시 공공데이터 API는 동일한 URL 패턴을 사용:
+ * {BASE}/{KEY}/json/{SERVICE}/{START}/{END}/{...filters}
+ */
+export async function fetchSeoulApi<T>(
+  serviceName: string,
   start: number,
   end: number,
-  filters: { codename?: string; title?: string; date?: string }
-) {
-  const base = `http://openapi.seoul.go.kr:8088/${KEY}/json/culturalEventInfo/${start}/${end}`;
+  filters: string[] = [],
+  cacheTag?: string
+): Promise<T[]> {
+  const filterPath =
+    filters.length > 0
+      ? '/' + filters.map((f) => (f ? encodeURIComponent(f) : '%20')).join('/')
+      : '/';
 
-  if (!filters.codename && !filters.title && !filters.date) {
-    return base + '/';
-  }
+  const url = `${BASE_URL}/${KEY}/json/${serviceName}/${start}/${end}${filterPath}`;
 
-  const codename = filters.codename ? encodeURIComponent(filters.codename) : '%20';
-  const title = filters.title ? encodeURIComponent(filters.title) : '%20';
-  const date = filters.date ? encodeURIComponent(filters.date) : '%20';
-  return `${base}/${codename}/${title}/${date}`;
+  const res = await fetch(url, {
+    next: {
+      revalidate: 3600,
+      tags: cacheTag ? [cacheTag] : undefined,
+    },
+  });
+
+  if (!res.ok) throw new Error(`Seoul OpenAPI HTTP ${res.status}: ${serviceName}`);
+
+  const json = await res.json();
+  const box = json?.[serviceName];
+
+  if (!box) return [];
+
+  const rows: T[] = Array.isArray(box.row) ? box.row : [];
+  return rows;
 }
+
+// culturalEventInfo 전용 래퍼 (기존 호환)
+import { SeoulApiRawRow } from './types/culturalEvent.types';
 
 export async function fetchSeoulRawEvents(filters: {
   codename?: string;
   title?: string;
   date?: string;
 }): Promise<SeoulApiRawRow[]> {
-  const url = buildUrl(1, 1000, filters);
-
-  console.log('[SeoulClient:FETCH]', { filters, url });
-
-  const res = await fetch(url, {
-    next: {
-      revalidate: 3600, // 1시간 캐시
-      tags: ['seoul-events'], // 캐시 무효화를 위한 태그
-    },
-  });
-
-  console.log('[SeoulClient:HTTP]', res.status);
-  if (!res.ok) throw new Error(`Seoul OpenAPI HTTP ${res.status}`);
-
-  const json = await res.json();
-  const box = json?.culturalEventInfo;
-  const result = box?.RESULT;
-  const allRows: SeoulApiRawRow[] = Array.isArray(box?.row) ? box.row : [];
-  const apiTotal: number = box?.list_total_count ?? allRows.length ?? 0;
-
-  console.log('[SeoulClient:RESULT]', {
-    code: result?.CODE,
-    message: result?.MESSAGE,
-    list_total_count: apiTotal,
-  });
-  console.log('[SeoulClient:ROWS-ALL]', { count: allRows.length, total: apiTotal });
-
-  return allRows;
+  return fetchSeoulApi<SeoulApiRawRow>(
+    'culturalEventInfo',
+    1,
+    1000,
+    [filters.codename ?? '', filters.title ?? '', filters.date ?? ''],
+    'seoul-events'
+  );
 }

@@ -33,7 +33,6 @@ export async function getPaginatedEvents(params: {
   });
 
   const correctTotal = filteredRows.length;
-  console.log('[EventService:FILTERED]', { apiCount: allRows.length, filteredCount: correctTotal });
 
   const startIdx = (requestedPage - 1) * requestedPageSize;
   const endIdx = startIdx + requestedPageSize;
@@ -42,8 +41,6 @@ export async function getPaginatedEvents(params: {
   const data: CulturalEvent[] = pagedRows
     .map((r: SeoulApiRawRow, idx: number) => mapSeoulRowToEvent(r, idx))
     .filter((x: CulturalEvent | null): x is CulturalEvent => !!x);
-
-  console.log('[EventService:PAGED]', { page: requestedPage, count: data.length });
 
   return {
     data,
