@@ -1,7 +1,10 @@
-const KEY = process.env.SEOUL_OPEN_API_KEY!;
-if (!KEY) throw new Error('Missing SEOUL_OPEN_API_KEY');
-
 const BASE_URL = 'http://openapi.seoul.go.kr:8088';
+
+function getApiKey(): string {
+  const key = process.env.SEOUL_OPEN_API_KEY;
+  if (!key) throw new Error('Missing SEOUL_OPEN_API_KEY');
+  return key;
+}
 
 /**
  * Seoul Open API 제네릭 클라이언트
@@ -20,7 +23,7 @@ export async function fetchSeoulApi<T>(
       ? '/' + filters.map((f) => (f ? encodeURIComponent(f) : '%20')).join('/')
       : '/';
 
-  const url = `${BASE_URL}/${KEY}/json/${serviceName}/${start}/${end}${filterPath}`;
+  const url = `${BASE_URL}/${getApiKey()}/json/${serviceName}/${start}/${end}${filterPath}`;
 
   const res = await fetch(url, {
     next: {
