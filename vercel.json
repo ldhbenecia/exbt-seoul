@@ -6,7 +6,7 @@
   "regions": ["icn1"],
   "crons": [
     {
-      "path": "/api/exhibitions",
+      "path": "/api/events",
       "schedule": "0 */6 * * *"
     }
   ]
