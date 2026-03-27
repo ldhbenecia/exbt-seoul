@@ -25,7 +25,7 @@ components/
   events/                    - 문화행사 관련 컴포넌트
   spaces/                    - 문화공간 관련 컴포넌트
   reservations/              - 예약 프로그램 관련 컴포넌트
-  shared/                    - 공용 컴포넌트 (ImageWithFallback, Skeleton)
+  common/                    - 공용 컴포넌트 (ImageWithFallback, Skeleton)
   ui/                        - shadcn/ui 기본 컴포넌트
 hooks/                       - React 커스텀 훅
 lib/
@@ -50,7 +50,7 @@ lib/
 
 - **UI 텍스트**: 한국어
 - **코드/변수/주석**: 영어
-- **커밋 메시지**: Conventional Commits (한국어 본문 허용)
+- **커밋 메시지**: Conventional Commits, 한국어 본문, `type(domain):` 형식 (예: `feat(ui):`, `fix(api):`)
 
 ### 스타일링
 
@@ -88,3 +88,9 @@ npm run build        # 프로덕션 빌드
 npm run lint         # ESLint
 npm run format       # Prettier
 ```
+
+## CI/CD
+
+- **Pre-commit**: husky + lint-staged (eslint --fix, prettier --write)
+- **GitHub Actions**: push/PR to main → lint, typecheck, build
+- **Deploy**: Vercel (자동 배포, `SEOUL_OPEN_API_KEY` 환경변수 필요)
