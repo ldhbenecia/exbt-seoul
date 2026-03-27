@@ -1,6 +1,6 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Calendar, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react';
 import { CulturalEvent } from '@/lib/types/culturalEvent';
 import { formatFullDate, getCodenameLabel } from '@/lib/utils/dateUtils';

@@ -2,13 +2,14 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 
-import { FilterBar, CodenameTab } from '@/components/FilterBar';
+import { FilterBar } from '@/components/events/FilterBar';
+import { CodenameTab } from '@/lib/constants/codenames';
 
 import { Button } from '@/components/ui/button';
 import { useEvents } from '@/hooks/useEvents';
 import { CulturalEvent } from '@/lib/types/culturalEvent';
-import { CulturalEventDetail } from '@/components/CulturalEventDetail';
-import { CulturalEventCard } from '@/components/CulturalEventCard';
+import { CulturalEventDetail } from '@/components/events/EventDetail';
+import { CulturalEventCard } from '@/components/events/EventCard';
 
 export default function Home() {
   const [codename, setCodename] = useState<CodenameTab>('전시/미술');

@@ -1,7 +1,7 @@
 import { CulturalEvent } from '@/lib/types/culturalEvent';
 import { getTodayDateString } from '@/lib/utils/dateUtils';
-import { SeoulApiRawRow } from '@/lib/data/seoul/seoul.types';
-import { mapSeoulRowToEvent } from '@/lib/data/seoul/seoul.mapper';
+import { SeoulApiRawRow } from '@/lib/data/seoul/types/culturalEvent.types';
+import { mapSeoulRowToEvent } from '@/lib/data/seoul/mappers/culturalEvent.mapper';
 import { fetchSeoulRawEvents } from '@/lib/data/seoul/seoul.client';
 
 export async function getPaginatedEvents(params: {

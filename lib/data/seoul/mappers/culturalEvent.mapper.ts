@@ -1,5 +1,5 @@
 import { CulturalEvent } from '@/lib/types/culturalEvent';
-import { SeoulApiRawRow } from './seoul.types';
+import { SeoulApiRawRow } from '../types/culturalEvent.types';
 
 export function mapSeoulRowToEvent(r: SeoulApiRawRow, idx: number): CulturalEvent | null {
   const title = (r.TITLE ?? '').trim();

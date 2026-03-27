@@ -1,4 +1,4 @@
-import { SeoulApiRawRow } from './seoul.types';
+import { SeoulApiRawRow } from './types/culturalEvent.types';
 
 const KEY = process.env.SEOUL_OPEN_API_KEY!;
 if (!KEY) throw new Error('Missing SEOUL_OPEN_API_KEY');
