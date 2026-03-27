@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'EXBT - Seoul Art Exhibitions',
-  description: '서울의 모든 전시회 정보를 한 곳에서',
+  title: 'EXBT - Seoul Cultural Events',
+  description: '서울의 전시, 공연, 축제 등 문화·예술 행사 정보를 한 곳에서',
 };
 
 export default function RootLayout({
