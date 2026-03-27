@@ -26,7 +26,8 @@ jobs:
       - name: Type Check
         run: npx tsc --noEmit
 
+      - name: Create .env
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
       - name: Build
         run: npm run build
-        env:
-          SEOUL_OPEN_API_KEY: ${{ secrets.SEOUL_OPEN_API_KEY }}
