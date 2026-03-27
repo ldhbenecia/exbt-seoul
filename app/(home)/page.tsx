@@ -1,10 +1,21 @@
 'use client';
 
-import { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { EventListSection } from '@/components/events/EventListSection';
-import { SpaceListSection } from '@/components/spaces/SpaceListSection';
-import { ReservationListSection } from '@/components/reservations/ReservationListSection';
+import { useState, lazy, Suspense } from 'react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EventGrid } from '@/components/events/EventGrid';
+import { EventCardSkeleton } from '@/components/events/EventCardSkeleton';
+
+const EventListSection = lazy(() =>
+  import('@/components/events/EventListSection').then((m) => ({ default: m.EventListSection }))
+);
+const SpaceListSection = lazy(() =>
+  import('@/components/spaces/SpaceListSection').then((m) => ({ default: m.SpaceListSection }))
+);
+const ReservationListSection = lazy(() =>
+  import('@/components/reservations/ReservationListSection').then((m) => ({
+    default: m.ReservationListSection,
+  }))
+);
 
 const MAIN_TABS = [
   { value: 'events', label: '문화행사' },
@@ -13,6 +24,16 @@ const MAIN_TABS = [
 ] as const;
 
 type MainTab = (typeof MAIN_TABS)[number]['value'];
+
+function TabFallback() {
+  return (
+    <EventGrid>
+      {Array.from({ length: 8 }).map((_, i) => (
+        <EventCardSkeleton key={i} />
+      ))}
+    </EventGrid>
+  );
+}
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<MainTab>('events');
@@ -36,17 +57,13 @@ export default function Home() {
             </TabsTrigger>
           ))}
         </TabsList>
-
-        <TabsContent value="events">
-          <EventListSection />
-        </TabsContent>
-        <TabsContent value="spaces">
-          <SpaceListSection />
-        </TabsContent>
-        <TabsContent value="reservations">
-          <ReservationListSection />
-        </TabsContent>
       </Tabs>
+
+      <Suspense fallback={<TabFallback />}>
+        {activeTab === 'events' && <EventListSection />}
+        {activeTab === 'spaces' && <SpaceListSection />}
+        {activeTab === 'reservations' && <ReservationListSection />}
+      </Suspense>
     </div>
   );
 }
