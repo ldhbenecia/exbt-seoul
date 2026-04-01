@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     description: '서울의 전시, 공연, 축제, 문화공간, 예약 프로그램 정보를 한 곳에서',
     locale: 'ko_KR',
     type: 'website',
+    siteName: 'EXBT',
   },
   twitter: {
     card: 'summary_large_image',
