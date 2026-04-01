@@ -166,6 +166,22 @@ dialog,
   display: none;
 }
 
+/* Skeleton shimmer - GPU accelerated */
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.8s ease-in-out infinite;
+  will-change: opacity;
+}
+
 /* Animation utilities */
 @keyframes fade-in {
   from {

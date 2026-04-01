@@ -8,11 +8,10 @@ import { Calendar, MapPin } from 'lucide-react';
 
 interface EventCardProps {
   event: CulturalEvent;
-  priority?: boolean;
   onClick: () => void;
 }
 
-export function EventCard({ event, priority = false, onClick }: EventCardProps) {
+export function EventCard({ event, onClick }: EventCardProps) {
   const title = event.title || '제목 없음';
   const venue = event.place || '장소 정보 없음';
   const start = formatShortDate(event.startDate);
@@ -24,7 +23,6 @@ export function EventCard({ event, priority = false, onClick }: EventCardProps) 
         <ImageWithFallback
           src={event.imageUrl}
           alt={title}
-          priority={priority}
           className="group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-2 left-2 flex items-center gap-1.5">

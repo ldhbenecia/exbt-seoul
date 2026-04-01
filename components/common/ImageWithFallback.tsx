@@ -1,37 +1,64 @@
 'use client';
 
-import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/components/ui/utils';
 import { ImageOff } from 'lucide-react';
 
 interface ImageWithFallbackProps {
   src?: string;
   alt: string;
-  fill?: boolean;
   width?: number;
-  height?: number;
   className?: string;
-  sizes?: string;
-  priority?: boolean;
 }
 
-export function ImageWithFallback({
-  src,
-  alt,
-  fill = true,
-  width,
-  height,
-  className,
-  sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
-  priority = false,
-}: ImageWithFallbackProps) {
-  const [hasError, setHasError] = useState(false);
+function optimizedSrc(src: string, width: number): string {
+  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=75`;
+}
 
-  if (!src || hasError) {
+export function ImageWithFallback({ src, alt, width = 640, className }: ImageWithFallbackProps) {
+  const [state, setState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const imgUrl = src ? optimizedSrc(src, width) : '';
+
+  useEffect(() => {
+    if (!src) {
+      setState('error');
+      return;
+    }
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          observer.disconnect();
+          setState('loading');
+
+          const img = new window.Image();
+          img.src = imgUrl;
+          img
+            .decode()
+            .then(() => setState('ready'))
+            .catch(() => setState('error'));
+        }
+      },
+      { rootMargin: '200px' }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [src, imgUrl]);
+
+  if (state === 'error' || !src) {
     return (
       <div
-        className={cn('flex items-center justify-center bg-muted text-muted-foreground', className)}
+        ref={containerRef}
+        className={cn(
+          'absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground',
+          className
+        )}
       >
         <ImageOff className="h-8 w-8 opacity-40" />
       </div>
@@ -39,17 +66,17 @@ export function ImageWithFallback({
   }
 
   return (
-    <Image
-      src={src}
-      alt={alt}
-      fill={fill}
-      width={fill ? undefined : width}
-      height={fill ? undefined : height}
-      sizes={sizes}
-      priority={priority}
-      className={cn('object-cover', className)}
-      onError={() => setHasError(true)}
-      unoptimized
-    />
+    <div ref={containerRef} className="absolute inset-0">
+      {(state === 'idle' || state === 'loading') && (
+        <div className="absolute inset-0 animate-shimmer bg-muted" />
+      )}
+      {state === 'ready' && (
+        <img
+          src={imgUrl}
+          alt={alt}
+          className={cn('absolute inset-0 w-full h-full object-cover fade-in', className)}
+        />
+      )}
+    </div>
   );
 }
