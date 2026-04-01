@@ -3,20 +3,20 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**.go.kr',
+        protocol: 'http',
+        hostname: 'culture.seoul.go.kr',
       },
       {
         protocol: 'https',
-        hostname: '**.org',
+        hostname: 'culture.seoul.go.kr',
       },
       {
         protocol: 'http',
-        hostname: '**.go.kr',
+        hostname: 'yeyak.seoul.go.kr',
       },
       {
-        protocol: 'http',
-        hostname: '**.org',
+        protocol: 'https',
+        hostname: 'yeyak.seoul.go.kr',
       },
     ],
   },
