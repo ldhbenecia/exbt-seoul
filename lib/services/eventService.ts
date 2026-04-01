@@ -3,6 +3,9 @@ import { getTodayDateString } from '@/lib/utils/dateUtils';
 import { SeoulApiRawRow } from '@/lib/data/seoul/types/culturalEvent.types';
 import { mapSeoulRowToEvent } from '@/lib/data/seoul/mappers/culturalEvent.mapper';
 import { fetchSeoulRawEvents } from '@/lib/data/seoul/seoul.client';
+import { FESTIVAL_PREFIX } from '@/lib/constants/codenames';
+
+const FESTIVAL_MARKER = '__festival__';
 
 export async function getPaginatedEvents(params: {
   page?: number;
@@ -17,19 +20,27 @@ export async function getPaginatedEvents(params: {
   const requestedPage = Math.max(1, params.page ?? 1);
   const requestedPageSize = Math.min(100, Math.max(1, params.pageSize ?? 20));
   const dateFilter = params.date || getTodayDateString();
+  const isFestival = params.codename === FESTIVAL_MARKER;
 
-  const { rows: allRows } = await fetchSeoulRawEvents({
-    codename: params.codename ?? '',
-    title: params.title ?? '',
-    date: dateFilter,
-  });
+  const { rows: allRows } = await fetchSeoulRawEvents();
 
   const today = dateFilter;
+  const codename = isFestival ? '' : (params.codename ?? '');
+  const title = (params.title ?? '').trim().toLowerCase();
+
   const filteredRows = allRows.filter((r: SeoulApiRawRow) => {
     const startDate = (r.STRTDATE ?? '').trim();
     const endDate = (r.END_DATE ?? '').trim();
     if (!startDate || !endDate) return false;
-    return startDate <= today && today <= endDate;
+    if (!(startDate <= today && today <= endDate)) return false;
+
+    if (codename && (r.CODENAME ?? '').trim() !== codename) return false;
+
+    if (isFestival && !(r.CODENAME ?? '').trim().startsWith(FESTIVAL_PREFIX)) return false;
+
+    if (title && !(r.TITLE ?? '').toLowerCase().includes(title)) return false;
+
+    return true;
   });
 
   const correctTotal = filteredRows.length;
