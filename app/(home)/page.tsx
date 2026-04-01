@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EventGrid } from '@/components/events/EventGrid';
 import { EventCardSkeleton } from '@/components/events/EventCardSkeleton';
@@ -37,6 +37,20 @@ function TabFallback() {
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<MainTab>('events');
+
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      const stored = sessionStorage.getItem('activeTab');
+      if (stored && MAIN_TABS.some((t) => t.value === stored)) {
+        setActiveTab(stored as MainTab);
+      }
+      return;
+    }
+    sessionStorage.setItem('activeTab', activeTab);
+  }, [activeTab]);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">

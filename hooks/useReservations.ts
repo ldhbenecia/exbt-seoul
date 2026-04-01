@@ -1,7 +1,7 @@
 'use client';
 
 import { Reservation } from '@/lib/types/reservation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 type ReservationsResponse = {
   data: Reservation[];
@@ -10,62 +10,67 @@ type ReservationsResponse = {
 
 export function useReservations(initialPage = 1, initialPageSize = 20) {
   const [items, setItems] = useState<Reservation[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(initialPage);
-  const [pageSize] = useState(initialPageSize);
   const [total, setTotal] = useState(0);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const pageRef = useRef(initialPage);
+  const fetchIdRef = useRef(0);
+  const hasFetchedRef = useRef(false);
 
   const hasMore = items.length < total;
 
-  useEffect(() => {
-    let cancelled = false;
-    async function fetchPage() {
-      try {
-        setIsLoading(true);
-        setError(null);
+  const fetchData = useCallback(
+    async (page: number, append: boolean) => {
+      const id = ++fetchIdRef.current;
+      setError(null);
 
+      try {
         const qs = new URLSearchParams({
           page: String(page),
-          pageSize: String(pageSize),
+          pageSize: String(initialPageSize),
         });
 
         const res = await fetch(`/api/reservations?${qs.toString()}`);
+        if (id !== fetchIdRef.current) return;
+
         if (!res.ok) throw new Error('예약 프로그램 정보를 불러오는데 실패했습니다.');
 
         const { data, meta } = (await res.json()) as ReservationsResponse;
-        if (cancelled) return;
+        if (id !== fetchIdRef.current) return;
 
-        setItems((prev) => (page === initialPage ? data : [...prev, ...data]));
+        setItems((prev) => (append ? [...prev, ...data] : data));
         setTotal(meta.total);
       } catch (err) {
-        if (cancelled) return;
+        if (id !== fetchIdRef.current) return;
+        setItems([]);
+        setTotal(0);
         setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (id === fetchIdRef.current && !hasFetchedRef.current) {
+          hasFetchedRef.current = true;
+          setInitialLoading(false);
+        }
       }
-    }
-    fetchPage();
-    return () => {
-      cancelled = true;
-    };
-  }, [page, pageSize, initialPage]);
+    },
+    [initialPageSize]
+  );
+
+  useEffect(() => {
+    pageRef.current = initialPage;
+    fetchData(initialPage, false);
+  }, [fetchData, initialPage]);
 
   return {
     items,
-    isLoading,
+    initialLoading,
     error,
     total,
-    page,
-    pageSize,
     hasMore,
     loadNext: () => {
-      if (hasMore && !isLoading) setPage((p) => p + 1);
-    },
-    reset: () => {
-      setPage(initialPage);
-      setItems([]);
-      setTotal(0);
+      if (hasMore) {
+        pageRef.current += 1;
+        fetchData(pageRef.current, true);
+      }
     },
   };
 }
