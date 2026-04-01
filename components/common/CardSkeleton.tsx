@@ -1,6 +1,6 @@
 import { Skeleton } from '@/components/common/Skeleton';
 
-export function EventCardSkeleton() {
+export function CardSkeleton() {
   return (
     <div className="overflow-hidden rounded-xl bg-card border border-border/50">
       <Skeleton className="aspect-[3/4] rounded-none" />

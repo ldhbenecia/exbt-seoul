@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { EventGrid } from '@/components/events/EventGrid';
-import { EventCardSkeleton } from '@/components/events/EventCardSkeleton';
+import { CardGrid } from '@/components/common/CardGrid';
+import { CardSkeleton } from '@/components/common/CardSkeleton';
 
 const EventListSection = lazy(() =>
   import('@/components/events/EventListSection').then((m) => ({ default: m.EventListSection }))
@@ -27,11 +27,11 @@ type MainTab = (typeof MAIN_TABS)[number]['value'];
 
 function TabFallback() {
   return (
-    <EventGrid>
+    <CardGrid>
       {Array.from({ length: 8 }).map((_, i) => (
-        <EventCardSkeleton key={i} />
+        <CardSkeleton key={i} />
       ))}
-    </EventGrid>
+    </CardGrid>
   );
 }
 

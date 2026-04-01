@@ -7,9 +7,10 @@ import { CulturalEvent } from '@/lib/types/culturalEvent';
 import { CodenameTab, CODENAME_TABS } from '@/lib/constants/codenames';
 import { FilterBar } from '@/components/events/FilterBar';
 import { EventCard } from '@/components/events/EventCard';
-import { EventGrid } from '@/components/events/EventGrid';
-import { EventCardSkeleton } from '@/components/events/EventCardSkeleton';
-import { EventEmptyState } from '@/components/events/EventEmptyState';
+import { CardGrid } from '@/components/common/CardGrid';
+import { CardSkeleton } from '@/components/common/CardSkeleton';
+import { ErrorState } from '@/components/common/ErrorState';
+import { EmptyState } from '@/components/common/EmptyState';
 import { CulturalEventDetail } from '@/components/events/EventDetail';
 import { Button } from '@/components/ui/button';
 
@@ -23,7 +24,7 @@ export function EventListSection() {
     if (!initializedRef.current) {
       initializedRef.current = true;
       const stored = sessionStorage.getItem('eventCodename');
-      if (stored && (CODENAME_TABS as readonly string[]).includes(stored)) {
+      if (stored && CODENAME_TABS.some((t) => t === stored)) {
         setCodename(stored as CodenameTab);
       }
       return;
@@ -42,8 +43,6 @@ export function EventListSection() {
     debouncedSearch
   );
 
-  const filteredItems = items;
-
   if (initialLoading) {
     return (
       <div className="space-y-6">
@@ -53,11 +52,11 @@ export function EventListSection() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
         />
-        <EventGrid>
+        <CardGrid>
           {Array.from({ length: 8 }).map((_, i) => (
-            <EventCardSkeleton key={i} />
+            <CardSkeleton key={i} />
           ))}
-        </EventGrid>
+        </CardGrid>
       </div>
     );
   }
@@ -71,34 +70,23 @@ export function EventListSection() {
         onSearchChange={setSearchQuery}
       />
 
-      {!error && filteredItems.length > 0 && (
+      {!error && items.length > 0 && (
         <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">{filteredItems.length}개</span> / 총 {total}
-          개
+          <span className="font-medium text-foreground">{items.length}개</span> / 총 {total}개
         </p>
       )}
 
-      {error && filteredItems.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
-            <span className="text-destructive text-xl">!</span>
-          </div>
-          <p className="text-destructive font-medium">{error}</p>
-          <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
-            다시 시도
-          </Button>
-        </div>
-      )}
+      {error && items.length === 0 && <ErrorState message={error} />}
 
-      {!error && filteredItems.length === 0 && <EventEmptyState />}
+      {!error && items.length === 0 && <EmptyState message="검색 결과가 없습니다" />}
 
-      {filteredItems.length > 0 && (
+      {items.length > 0 && (
         <>
-          <EventGrid>
-            {filteredItems.map((event) => (
+          <CardGrid>
+            {items.map((event) => (
               <EventCard key={event.id} event={event} onClick={() => setSelectedEvent(event)} />
             ))}
-          </EventGrid>
+          </CardGrid>
 
           <div className="flex justify-center pt-4">
             <Button onClick={loadNext} disabled={!hasMore} variant="outline">
