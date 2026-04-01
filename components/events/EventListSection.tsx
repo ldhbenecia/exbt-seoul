@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useEvents } from '@/hooks/useEvents';
 import { useDebounce } from '@/hooks/useDebounce';
 import { CulturalEvent } from '@/lib/types/culturalEvent';
-import { CodenameTab, FESTIVAL_CODENAMES } from '@/lib/constants/codenames';
+import { CodenameTab, CODENAME_TABS } from '@/lib/constants/codenames';
 import { FilterBar } from '@/components/events/FilterBar';
 import { EventCard } from '@/components/events/EventCard';
 import { EventGrid } from '@/components/events/EventGrid';
@@ -16,6 +16,21 @@ import { Button } from '@/components/ui/button';
 export function EventListSection() {
   const [codename, setCodename] = useState<CodenameTab>('전체');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      const stored = sessionStorage.getItem('eventCodename');
+      if (stored && (CODENAME_TABS as readonly string[]).includes(stored)) {
+        setCodename(stored as CodenameTab);
+      }
+      return;
+    }
+    sessionStorage.setItem('eventCodename', codename);
+  }, [codename]);
+
   const [selectedEvent, setSelectedEvent] = useState<CulturalEvent | null>(null);
 
   const debouncedSearch = useDebounce(searchQuery);
@@ -27,10 +42,7 @@ export function EventListSection() {
     debouncedSearch
   );
 
-  const filteredItems =
-    codename === '축제'
-      ? items.filter((e) => FESTIVAL_CODENAMES.includes(e.codename ?? ''))
-      : items;
+  const filteredItems = items;
 
   if (initialLoading) {
     return (
@@ -83,13 +95,8 @@ export function EventListSection() {
       {filteredItems.length > 0 && (
         <>
           <EventGrid>
-            {filteredItems.map((event, i) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                priority={i < 4}
-                onClick={() => setSelectedEvent(event)}
-              />
+            {filteredItems.map((event) => (
+              <EventCard key={event.id} event={event} onClick={() => setSelectedEvent(event)} />
             ))}
           </EventGrid>
 
