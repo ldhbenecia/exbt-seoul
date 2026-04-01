@@ -12,14 +12,13 @@ export async function getPaginatedEvents(params: {
   pageSize?: number;
   codename?: string;
   title?: string;
-  date?: string;
 }): Promise<{
   data: CulturalEvent[];
   meta: { total: number; page: number; pageSize: number; count: number };
 }> {
   const requestedPage = Math.max(1, params.page ?? 1);
   const requestedPageSize = Math.min(100, Math.max(1, params.pageSize ?? 20));
-  const dateFilter = params.date || getTodayDateString();
+  const dateFilter = getTodayDateString();
   const isFestival = params.codename === FESTIVAL_MARKER;
 
   const { rows: allRows } = await fetchSeoulRawEvents();

@@ -13,8 +13,7 @@ export function useEvents(
   initialPage = 1,
   initialPageSize = 20,
   codename: CodenameTab | '' = '',
-  title = '',
-  date = ''
+  title = ''
 ) {
   const [items, setItems] = useState<CulturalEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +39,6 @@ export function useEvents(
         });
         if (slug) qs.set('codename', slug);
         if (title) qs.set('title', title);
-        if (date) qs.set('date', date);
 
         const res = await fetch(`/api/events?${qs.toString()}`);
         if (id !== fetchIdRef.current) return;
@@ -71,7 +69,7 @@ export function useEvents(
         }
       }
     },
-    [codename, title, date, initialPageSize]
+    [codename, title, initialPageSize]
   );
 
   useEffect(() => {

@@ -12,9 +12,8 @@ export async function GET(req: Request) {
     const slug = url.searchParams.get('codename') ?? '';
     const codename = SLUG_TO_CODENAME[slug] ?? slug;
     const title = url.searchParams.get('title') ?? '';
-    const date = url.searchParams.get('date') ?? '';
 
-    const { data, meta } = await getPaginatedEvents({ page, pageSize, codename, title, date });
+    const { data, meta } = await getPaginatedEvents({ page, pageSize, codename, title });
 
     return NextResponse.json({ data, meta });
   } catch (error) {
